@@ -84,6 +84,23 @@ public:
         }
     }
 
+    int Buy(vector<string> prods, vector<size_t> counts){
+        if(prods.size() != counts.size())
+            throw("Some exception!");
+        for(size_t i = 0; i < prods.size(); i++){
+            size_t count = products.find(prods[i])->second.GetCount();
+            if(count < counts[i]){
+                return -1;
+            }
+        }
+        size_t sum = 0;
+        for(size_t i = 0; i < prods.size(); i++){
+            size_t count = products.find(prods[i])->second.GetCount();
+            sum += products.find(prods[i])->second.GetSumPrice(count);
+            products.find(prods[i])->second.Get(count);
+        }
+        return sum;
+    }
 
 };
 
@@ -105,9 +122,7 @@ public:
             if (iter->GetPrice(code) < minPrice) {
                 minPrice = iter->GetPrice(code);
                 ShopName = iter->GetName();
-
             }
-
         }
         cout << minPrice << endl;
         return ShopName;
@@ -129,6 +144,7 @@ int main() {
     person.AddShop(first);
     person.AddShop(second);
     cout << person.FindShopWithCheepestProduct("54637281");
+    cout << first.Buy({"54637284", "54637281"}, {10, 2});
 
     return 0;
 }
