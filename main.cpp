@@ -78,7 +78,8 @@ public:
                     if(x > iter->second.GetCount())
                         x = iter->second.GetCount();
                     sum += x * iter->second.GetPrice();
-                    cout << iter->second.GetName() <<": " << x << endl;
+                    if(x > 0)
+                        cout << iter->second.GetName() <<": " << x << endl;
                 }
             } else break;
         }
@@ -166,30 +167,55 @@ public:
 };
 
 int main() {
-    Shop first = Shop("123", "Ikea");
-    Shop second = Shop("1233", "Ikea2");
-    Shop third = Shop("1233", "Ikea3");
-    Product notebooks = Product("54637284", "Notebook");
-    Product paper = Product("54637281", "Paper");
+    system("chcp 65001");
+    Shop first = Shop("123", "Икея");
+    Shop second = Shop("1233", "Лента");
+    Shop third = Shop("1233", "Карусель");
+
+
+    Product notebooks = Product("54637284", "Блокнот");
+    Product paper = Product("54637281", "Бумага");
+    Product camera = Product("5463728", "Фотоаппарат");
+    Product book = Product("5463721", "Книга");
+    Product map = Product("5463726", "Карта");
+    Product mobilephone = Product("546371", "Мобильный телефон");
+    Product phone = Product("57281", "Телефон");
+    Product tablet = Product("54767281", "Планшет");
+    Product pen = Product("5476571", "Ручка");
+    Product pencil = Product("5476572", "Карандаш");
+
     first.AddProducts(notebooks, 100, 20);
     first.AddProducts(paper, 5, 30);
-    second.AddProducts(paper, 100, 50);
+    first.AddProducts(camera, 100, 50);
+    first.AddProducts(book, 100, 25);
+    first.AddProducts(map, 5, 30);
+    first.AddProducts(mobilephone, 100, 506);
 
+    second.AddProducts(map, 100, 10);
+    second.AddProducts(tablet, 5, 3054);
     second.AddProducts(notebooks, 100, 10);
-    second.AddProducts(paper, 5, 300);
+    second.AddProducts(phone, 5, 3050);
+    second.AddProducts(pencil, 100, 10);
+    second.AddProducts(pen, 5, 30);
 
     third.AddProducts(notebooks, 100, 10);
-    third.AddProducts(paper, 5, 3);
+    third.AddProducts(paper, 5, 32);
+    third.AddProducts(pen, 100, 10);
+    third.AddProducts(pencil, 5, 32);
+    third.AddProducts(book, 100, 103);
+    third.AddProducts(tablet, 5, 3765);
 
     first.Buy(290);
+    second.Buy(290);
+    third.Buy(290);
 
     Person person = Person(100);
     person.AddShop(first);
     person.AddShop(second);
     person.AddShop(third);
 
-   // cout << person.FindShopWithCheepestProduct("54637281");
-   // cout << first.Buy({"54637284", "54637281"}, {10, 2});
+    cout << person.FindShopWithCheepestProduct("54637281") << endl;
+    cout << first.Buy({"54637284", "54637281"}, {10, 2}) << endl;
     cout << person.FindCheepestShowVector({"54637284", "54637281"}, {10, 2});
     return 0;
 }
