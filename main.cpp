@@ -55,6 +55,11 @@ public:
         //cout << products.find(prod.GetCode())->first;
         products.find(prod.GetCode())->second.Load(count, price);
     }
+    size_t isInstance(string code){
+        if(products.count(code) == 0)
+            return 0;
+        return 1;
+    }
     size_t GetPrice(string code){
         //isInstance?
         if(products.count(code) == 0)
@@ -66,7 +71,7 @@ public:
     }
     void Buy(size_t count){
         size_t sum = 0;
-        for(unordered_map<string, Product>::iterator iter = products.begin(); iter != products.end(); iter++){
+        for(auto iter = products.begin(); iter != products.end(); iter++){
             if(sum < count){
                 if(iter->second.GetCount() > 0){
                     size_t x = (count - sum) / iter->second.GetPrice();
@@ -75,7 +80,7 @@ public:
                     sum += x * iter->second.GetPrice();
                     cout << iter->second.GetName() <<": " << x << endl;
                 }
-            }
+            } else break;
         }
     }
 
@@ -90,16 +95,19 @@ public:
     void AddShop(Shop shop){
         visible_shops.push_back(shop);
     }
-    string FindShopWithCheepestProduct(string code){
+    string FindShopWithCheepestProduct(string const code){
         vector<Shop>::iterator iter = visible_shops.begin();
         size_t minPrice = iter->GetPrice(code);
         string ShopName = iter->GetName();
         for(; iter != visible_shops.end(); iter++){
-            if(iter->GetPrice(code) < minPrice){
+            if(iter->isInstance(code) == 0)
+                continue;
+            if (iter->GetPrice(code) < minPrice) {
                 minPrice = iter->GetPrice(code);
                 ShopName = iter->GetName();
 
             }
+
         }
         cout << minPrice << endl;
         return ShopName;
@@ -109,19 +117,18 @@ public:
 int main() {
     Shop first = Shop("123", "Ikea");
     Shop second = Shop("1233", "Ikea2");
-    Shop third = Shop("123", "Ikea3");
-    Shop fouth = Shop("1233", "Ikea4");
     Product notebooks = Product("54637284", "Notebook");
     Product paper = Product("54637281", "Paper");
-    first.AddProducts(notebooks, 100, 20);
-    first.AddProducts(paper, 100, 30);
-    third.AddProducts(notebooks, 100, 110);
-    fouth.AddProducts(notebooks, 100, 30);
+    first.AddProducts(notebooks, 1, 20);
+    first.AddProducts(paper, 5, 30);
+    second.AddProducts(paper, 100, 50);
+
     first.Buy(290);
+
     Person person = Person(100);
     person.AddShop(first);
     person.AddShop(second);
-    cout << person.FindShopWithCheepestProduct("54637284");
+    cout << person.FindShopWithCheepestProduct("54637281");
 
     return 0;
 }
