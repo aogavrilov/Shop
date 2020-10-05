@@ -4,6 +4,14 @@
 #include <fstream>
 using namespace std;
 
+class MyException{
+private:
+    string m_error;
+public:
+    MyException(string reason) : m_error(reason){}
+    const char* getError() { return m_error.c_str(); }
+};
+
 class Product{
     string code;
     string name;
@@ -18,7 +26,7 @@ public:
     }
     void Get(size_t count){
         if(count > this->count)
-            throw("You would like buy more product then in shop!");
+            throw MyException("You would like buy more product then in shop!");
         else
             this->count -= count;
     }
@@ -30,7 +38,7 @@ public:
     }
     size_t GetSumPrice(size_t count){
         if(count > this->count)
-            throw("You would like buy more product then in shop!");
+            throw MyException("You would like buy more product then in shop!");
         else
             return count * this->price;
     }
@@ -63,7 +71,7 @@ public:
     size_t GetPrice(string code){
         //isInstance?
         if(products.count(code) == 0)
-            throw("Object isn't Instance!");
+            throw MyException("Object isn't Instance!");
         return products.find(code)->second.GetPrice();
     }
     string GetName(){
@@ -84,10 +92,9 @@ public:
             } else break;
         }
     }
-
     int Buy(vector<string> prods, vector<size_t> counts){
         if(prods.size() != counts.size())
-            throw("Some exception!");
+            throw MyException("Some exception!");
         for(size_t i = 0; i < prods.size(); i++){
             size_t count = products.find(prods[i])->second.GetCount();
             if(count < counts[i]){
@@ -102,10 +109,9 @@ public:
         }
         return sum;
     }
-
     int GetPriceOnVector(vector<string> prods, vector<size_t> counts){
         if(prods.size() != counts.size())
-            throw("Some exception!");
+            throw MyException("Some exception!");
         for(size_t i = 0; i < prods.size(); i++){
             size_t count = products.find(prods[i])->second.GetCount();
             if(count < counts[i]){
@@ -119,7 +125,6 @@ public:
         }
         return sum;
     }
-
 };
 
 class Person{
@@ -142,7 +147,6 @@ public:
                 ShopName = iter->GetName();
             }
         }
-        cout << minPrice << endl;
         return ShopName;
     }
     string FindCheepestShowVector(vector<string> prods, vector<size_t> counts){
