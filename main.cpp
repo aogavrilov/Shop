@@ -4,7 +4,7 @@
 #include <fstream>
 using namespace std;
 
-class MyException{
+class MyException:exception{
 private:
     string m_error;
 public:
@@ -60,7 +60,6 @@ public:
     Shop(string code, string name):code(code), name(name){}
     void AddProducts(Product prod, size_t count, size_t price){
         products.insert(std::unordered_map< string, Product >::value_type (prod.GetCode(), prod));
-        //cout << products.find(prod.GetCode())->first;
         products.find(prod.GetCode())->second.Load(count, price);
     }
     size_t isInstance(string code){
@@ -77,8 +76,9 @@ public:
     string GetName(){
         return this->name;
     }
-    void Buy(size_t count){
+    vector<pair<string, size_t>> Buy(size_t count){
         size_t sum = 0;
+        vector<pair<string, size_t>> result = vector<pair<string, size_t>>();
         for(auto iter = products.begin(); iter != products.end(); iter++){
             if(sum < count){
                 if(iter->second.GetCount() > 0){
@@ -87,10 +87,11 @@ public:
                         x = iter->second.GetCount();
                     sum += x * iter->second.GetPrice();
                     if(x > 0)
-                        cout << iter->second.GetName() <<": " << x << endl;
+                        result.push_back(make_pair(iter->second.GetName(), x));
                 }
             } else break;
         }
+        return result;
     }
     int Buy(vector<string> prods, vector<size_t> counts){
         if(prods.size() != counts.size())
@@ -104,7 +105,7 @@ public:
         size_t sum = 0;
         for(size_t i = 0; i < prods.size(); i++){
             size_t count = products.find(prods[i])->second.GetCount();
-            sum += products.find(prods[i])->second.GetSumPrice(count);
+            sum += products.find(prods[i])->second.GetSumPrice(counts[i]);
             products.find(prods[i])->second.Get(count);
         }
         return sum;
@@ -113,11 +114,16 @@ public:
         if(prods.size() != counts.size())
             throw MyException("Some exception!");
         for(size_t i = 0; i < prods.size(); i++){
-            size_t count = products.find(prods[i])->second.GetCount();
-            if(count < counts[i]){
+            if(products.count(prods[i]) == 0){
+                return -1;
+            }
+            size_t count = 0;
+            count = products.find(prods[i])->second.GetCount();
+            if(count < counts[i]) {
                 return -1;
             }
         }
+
         size_t sum = 0;
         for(size_t i = 0; i < prods.size(); i++){
             size_t count = products.find(prods[i])->second.GetCount();
@@ -149,7 +155,7 @@ public:
         }
         return ShopName;
     }
-    string FindCheepestShowVector(vector<string> prods, vector<size_t> counts){
+    string FindCheepestShopVector(vector<string> prods, vector<size_t> counts){
         size_t sum = 0;
         string name;
         for(auto iter = visible_shops.begin(); iter != visible_shops.end(); iter++){
@@ -159,11 +165,13 @@ public:
             if(sum == 0){
                 sum = shop_sum;
                 name = iter->GetName();
+                continue;
             }
             if(sum > shop_sum){
                 sum = shop_sum;
                 name = iter->GetName();
             }
+
 
         }
         return name;
@@ -189,7 +197,7 @@ int main() {
     Product pencil = Product("5476572", "Карандаш");
 
     first.AddProducts(notebooks, 100, 20);
-    first.AddProducts(paper, 5, 30);
+    first.AddProducts(paper, 50, 30);
     first.AddProducts(camera, 100, 50);
     first.AddProducts(book, 100, 25);
     first.AddProducts(map, 5, 30);
@@ -209,9 +217,14 @@ int main() {
     third.AddProducts(book, 100, 103);
     third.AddProducts(tablet, 5, 3765);
 
-    first.Buy(290);
-    second.Buy(290);
-    third.Buy(290);
+    vector<pair<string, size_t>> res =  first.Buy(290);
+    cout << "=============================" << endl;
+    for(auto iter = res.begin(); iter != res.end(); iter++){
+        cout << iter->first << ": " << iter->second << endl;
+    }
+    cout << "==============================" << endl;
+    //second.Buy(290);
+    //third.Buy(290);
 
     Person person = Person(100);
     person.AddShop(first);
@@ -219,7 +232,9 @@ int main() {
     person.AddShop(third);
 
     cout << person.FindShopWithCheepestProduct("54637281") << endl;
+
     cout << first.Buy({"54637284", "54637281"}, {10, 2}) << endl;
-    cout << person.FindCheepestShowVector({"54637284", "54637281"}, {10, 2});
+
+    cout << person.FindCheepestShopVector({"54637284", "54637281"}, {10, 2});
     return 0;
 }
